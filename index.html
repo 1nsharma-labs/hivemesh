@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMesh — Multi-Agent Workspace Orchestration Mesh</title>
+  <style>
+    :root {
+      --bg: #090e17;
+      --card-bg: #101726;
+      --accent: #eab308;
+      --accent-dim: rgba(234, 179, 8, 0.15);
+      --border: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --agent-arch: #38bdf8;
+      --agent-coder: #10b981;
+      --agent-sec: #f43f5e;
+      --agent-qa: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 24px;
+    }
+    .header {
+      max-width: 1200px;
+      margin: 0 auto 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .logo h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      margin-left: 8px;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .main-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .agents-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .agent-box {
+      background: #0d1424;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      position: relative;
+    }
+    .agent-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .agent-role { font-weight: 700; font-size: 13px; color: #fff; }
+    .agent-status { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .board-column {
+      background: #090e1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 280px;
+    }
+    .task-card {
+      background: #111a2e;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      border-left: 3px solid var(--accent);
+    }
+    .btn-dispatch {
+      background: var(--accent);
+      color: #030712;
+      border: none;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 16px;
+      transition: opacity 0.2s;
+    }
+    .btn-dispatch:hover { opacity: 0.9; }
+    .terminal {
+      background: #040711;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      color: #fef08a;
+      height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <span class="badge">v1.0.0</span>
+      <div>
+        <h1>🐝 HiveMesh</h1>
+        <div class="subtitle">Autonomous Multi-Agent Workspace Orchestration Mesh & Event Blackboard (Powered by Hive)</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="https://github.com/1nsharma-labs/hivemesh" target="_blank">⭐ GitHub Repo</a>
+      <a href="https://polar.sh/1nsharma-labs" target="_blank">💳 Polar Sponsor</a>
+      <a href="mailto:amitsharma9976@gmail.com">✉️ Contact Enterprise</a>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <div>
+      <!-- Swarm Agents -->
+      <div class="card">
+        <h2>👥 Active Agent Swarm</h2>
+        <div class="agents-grid">
+          <div class="agent-box" id="ag-arch">
+            <div class="agent-avatar" style="background:rgba(56,189,248,0.2); color:var(--agent-arch);">🏛️</div>
+            <div class="agent-role">Architect</div>
+            <div class="agent-status" id="st-arch">IDLE</div>
+          </div>
+          <div class="agent-box" id="ag-coder">
+            <div class="agent-avatar" style="background:rgba(16,185,129,0.2); color:var(--agent-coder);">💻</div>
+            <div class="agent-role">Coder</div>
+            <div class="agent-status" id="st-coder">IDLE</div>
+          </div>
+          <div class="agent-box" id="ag-sec">
+            <div class="agent-avatar" style="background:rgba(244,63,94,0.2); color:var(--agent-sec);">🔒</div>
+            <div class="agent-role">SecurityGuard</div>
+            <div class="agent-status" id="st-sec">IDLE</div>
+          </div>
+          <div class="agent-box" id="ag-qa">
+            <div class="agent-avatar" style="background:rgba(168,85,247,0.2); color:var(--agent-qa);">🧪</div>
+            <div class="agent-role">Tester</div>
+            <div class="agent-status" id="st-qa">IDLE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Blackboard -->
+      <div class="card">
+        <h2>📋 Shared Event Blackboard Pipeline</h2>
+        <div class="board-column" id="boardTasks">
+          <div class="task-card">
+            <b>1. Design Micro-Gateway Architecture</b><br>
+            <span style="color:var(--text-muted);">Assigned to: Architect • Status: PENDING</span>
+          </div>
+          <div class="task-card">
+            <b>2. Implement Proxy Router & Token Tracking</b><br>
+            <span style="color:var(--text-muted);">Assigned to: Coder • Depends on Task #1</span>
+          </div>
+          <div class="task-card">
+            <b>3. Secret & Injection Audit</b><br>
+            <span style="color:var(--text-muted);">Assigned to: SecurityGuard • Depends on Task #2</span>
+          </div>
+          <div class="task-card">
+            <b>4. End-to-End Regression Test Suite</b><br>
+            <span style="color:var(--text-muted);">Assigned to: Tester • Depends on Task #3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls & MCP -->
+    <div>
+      <div class="card">
+        <h2>⚡ Swarm Orchestration</h2>
+        <button class="btn-dispatch" onclick="runSwarm()">🚀 Dispatch Multi-Agent Swarm</button>
+        <div class="terminal" id="termOutput">$ hivemesh ready.
+Shared Blackboard initialized. 4 autonomous agents listening.
+Click 'Dispatch Multi-Agent Swarm' to watch live coordination...</div>
+      </div>
+
+      <div class="card">
+        <h2>🔮 Claude Desktop & Cursor MCP</h2>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+          Orchestrate multi-agent swarms directly from Claude / Cursor:
+        </p>
+        <pre style="background:#040711; padding:10px; border-radius:6px; font-size:11px; color:#fef08a; overflow-x:auto;">{
+  "mcpServers": {
+    "hivemesh": {
+      "command": "npx",
+      "args": ["-y", "hivemesh", "mcp"]
+    }
+  }
+}</pre>
+        <div style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
+          Founder: <b>Amit Sharma</b> (@1nsharma) • UPI: <code>6393741171@upi</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const term = document.getElementById('termOutput');
+
+    function log(msg) {
+      term.textContent += '\n' + msg;
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function runSwarm() {
+      term.textContent = '$ hivemesh run "Build user authentication service"\n🐝 Dispatching Multi-Agent Swarm...';
+      
+      document.getElementById('st-arch').textContent = 'WORKING...';
+      document.getElementById('st-arch').style.color = '#38bdf8';
+      
+      setTimeout(() => {
+        log('Round 1: [Architect] claimed Task #1 -> "Design Micro-Gateway Architecture"');
+        log('  ✔ Generated design spec: 3 services, JWT flow, rate limiter.');
+        document.getElementById('st-arch').textContent = 'COMPLETED';
+        document.getElementById('st-arch').style.color = '#10b981';
+
+        document.getElementById('st-coder').textContent = 'WORKING...';
+        document.getElementById('st-coder').style.color = '#10b981';
+      }, 700);
+
+      setTimeout(() => {
+        log('Round 2: [Coder] dependencies cleared. Claimed Task #2 -> "Implement Proxy Router"');
+        log('  ✔ Created 145 lines in src/server.js.');
+        document.getElementById('st-coder').textContent = 'COMPLETED';
+
+        document.getElementById('st-sec').textContent = 'AUDITING...';
+        document.getElementById('st-sec').style.color = '#f43f5e';
+      }, 1400);
+
+      setTimeout(() => {
+        log('Round 3: [SecurityGuard] claimed Task #3 -> "Secret & Injection Audit"');
+        log('  ✔ 0 secrets leaked, PromptArmor checks passed.');
+        document.getElementById('st-sec').textContent = 'PASSED';
+        document.getElementById('st-sec').style.color = '#10b981';
+
+        document.getElementById('st-qa').textContent = 'TESTING...';
+        document.getElementById('st-qa').style.color = '#a855f7';
+      }, 2100);
+
+      setTimeout(() => {
+        log('Round 4: [Tester] claimed Task #4 -> "Automated QA & Regression Suite"');
+        log('  ✔ 12/12 unit tests passed. 98.4% code coverage.');
+        document.getElementById('st-qa').textContent = 'VERIFIED';
+        document.getElementById('st-qa').style.color = '#10b981';
+        log('═══════════════════════════════════════════════════');
+        log('🎉 SWARM EXECUTION COMPLETE: All 4 tasks completed in 4 rounds (2.8s)!');
+      }, 2800);
+    }
+  </script>
+</body>
+</html>
